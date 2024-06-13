@@ -81,6 +81,7 @@ class NetworkTrainer(object):
         self.output_folder = None
         self.fold = None
         self.loss = None
+        self.loss_function = None
         self.dataset_directory = None
 
         ################# SET THESE IN LOAD_DATASET OR DO_SPLIT ############################
@@ -95,7 +96,7 @@ class NetworkTrainer(object):
         self.train_loss_MA_alpha = 0.93  # alpha * old + (1-alpha) * new
         self.train_loss_MA_eps = 5e-4  # new MA must be at least this much better (smaller)
         self.max_num_epochs = None#300#1000
-        print(f"The value of self.max_num_epochs is: {self.max_num_epochs}")
+        # print(f"The value of self.max_num_epochs is: {self.max_num_epochs}")
         self.num_batches_per_epoch = 250
         self.num_val_batches_per_epoch = 50
         self.also_val_in_tr_mode = False

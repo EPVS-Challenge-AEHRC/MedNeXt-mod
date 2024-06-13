@@ -37,7 +37,8 @@ from nnunet_mednext.postprocessing.connected_components import determine_postpro
 from nnunet_mednext.training.data_augmentation.default_data_augmentation import default_3D_augmentation_params, \
     default_2D_augmentation_params, get_default_augmentation, get_patch_size
 from nnunet_mednext.training.dataloading.dataset_loading import load_dataset, DataLoader3D, DataLoader2D, unpack_dataset
-from nnunet_mednext.training.loss_functions.dice_loss import DC_and_CE_loss
+from nnunet_mednext.training.loss_functions.dice_loss import DC_and_CE_loss, SoftDiceLoss, DC_and_topk_loss, DC_and_focal_loss, DC_and_focalv2_loss
+from nnunet_mednext.training.loss_functions.focal_loss import FocalLoss, FocalLossV2
 from nnunet_mednext.training.network_training.network_trainer import NetworkTrainer
 from nnunet_mednext.utilities.nd_softmax import softmax_helper
 from nnunet_mednext.utilities.tensor_utilities import sum_tensor
@@ -46,7 +47,7 @@ matplotlib.use("agg")
 
 
 class nnUNetTrainer(NetworkTrainer):
-    def __init__(self, plans_file, fold, max_num_epochs=1000, output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
+    def __init__(self, plans_file, fold, max_num_epochs=1000, loss_function='DC_and_CE_loss', output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
                  unpack_data=True, deterministic=True, fp16=False, sample_by_frequency=False):
         """
         :param deterministic:
@@ -74,7 +75,7 @@ class nnUNetTrainer(NetworkTrainer):
         """
         super(nnUNetTrainer, self).__init__(deterministic, fp16)
         self.unpack_data = unpack_data
-        self.init_args = (plans_file, fold, max_num_epochs, output_folder, dataset_directory, batch_dice, stage, unpack_data,
+        self.init_args = (plans_file, fold, max_num_epochs, loss_function, output_folder, dataset_directory, batch_dice, stage, unpack_data,
                           deterministic, fp16)
         # set through arguments from init
         self.stage = stage
@@ -88,6 +89,8 @@ class nnUNetTrainer(NetworkTrainer):
         self.sample_by_frequency = sample_by_frequency
 
         self.plans = None
+        
+        print('max number of epochs is: ', self.max_num_epochs)
 
         # if we are running inference only then the self.dataset_directory is set (due to checkpoint loading) but it
         # irrelevant
@@ -107,7 +110,41 @@ class nnUNetTrainer(NetworkTrainer):
         self.basic_generator_patch_size = self.data_aug_params = self.transpose_forward = self.transpose_backward = None
 
         self.batch_dice = batch_dice
-        self.loss = DC_and_CE_loss({'batch_dice': self.batch_dice, 'smooth': 1e-5, 'do_bg': False}, {})
+        self.loss_function = loss_function
+        
+        if self.loss_function == 'DC_and_CE_loss':
+            self.loss = DC_and_CE_loss({'batch_dice': self.batch_dice, 'smooth': 1e-5, 'do_bg': False}, {})
+            print("***************Using loss function: DC_and_CE_loss******************")
+            
+        elif self.loss_function == 'SoftDiceLoss':
+            self.loss = SoftDiceLoss(apply_nonlin = softmax_helper, batch_dice = self.batch_dice, do_bg = False, smooth = 1e-5)
+            print("***************Using loss function: SoftDiceLoss******************")
+            
+        elif self.loss_function == 'DC_and_topk_loss':
+            self.loss = DC_and_topk_loss({'batch_dice': self.batch_dice, 'smooth': 1e-5, 'do_bg': False}, {'k': 10})
+            print("***************Using loss function: DC_and_topk_loss******************")
+            
+        elif self.loss_function == 'DC_and_focal_loss':
+            self.loss = DC_and_focal_loss({'batch_dice': self.batch_dice, 'smooth': 1e-5, 'do_bg': False}, {'apply_nonlin': softmax_helper, 'alpha': 0.25, 'gamma': 2})
+            print("***************Using loss function: DC_and_focal_loss******************")
+            
+        elif self.loss_function == 'DC_and_focalv2_loss':
+            self.loss = DC_and_focalv2_loss({'batch_dice': self.batch_dice, 'smooth': 1e-5, 'do_bg': False}, {'apply_nonlin': softmax_helper, 'alpha': 0.25, 'gamma': 2})
+            print("***************Using loss function: DC_and_focalv2_loss******************")
+            
+        elif self.loss_function == 'FocalLoss':
+            self.loss = FocalLoss(apply_nonlin = softmax_helper, alpha = 0.25, gamma = 2)
+            print("***************Using loss function: FocalLoss******************")
+            
+        elif self.loss_function == 'FocalLossV2':
+            self.loss = FocalLossV2(apply_nonlin = softmax_helper, alpha = 0.25, gamma = 2)
+            print("***************Using loss function: FocalLossV2******************")
+            
+        else: 
+            
+            raise ValueError(f"Unknown loss function: {loss_function}")
+            
+            
 
         self.online_eval_foreground_dc = []
         self.online_eval_tp = []
@@ -132,6 +169,7 @@ class nnUNetTrainer(NetworkTrainer):
 
         self.conv_per_stage = None
         self.regions_class_order = None
+        
 
     def update_fold(self, fold):
         """

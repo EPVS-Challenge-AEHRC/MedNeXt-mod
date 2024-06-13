@@ -16,6 +16,7 @@
 from unittest import result
 import torch
 from nnunet_mednext.training.loss_functions.TopK_loss import TopKLoss
+from nnunet_mednext.training.loss_functions.focal_loss import FocalLoss, FocalLossV2
 from nnunet_mednext.training.loss_functions.crossentropy import RobustCrossEntropyLoss
 from nnunet_mednext.utilities.nd_softmax import softmax_helper
 from nnunet_mednext.utilities.tensor_utilities import sum_tensor
@@ -487,6 +488,44 @@ class DC_and_topk_loss(nn.Module):
         ce_loss = self.ce(net_output, target)
         if self.aggregate == "sum":
             result = ce_loss + dc_loss
+        else:
+            raise NotImplementedError("nah son") # reserved for other stuff (later?)
+        return result
+    
+class DC_and_focal_loss(nn.Module):
+    def __init__(self, soft_dice_kwargs, focal_kwargs, aggregate="sum", square_dice=False):
+        super(DC_and_focal_loss, self).__init__()
+        self.aggregate = aggregate
+        self.fo = FocalLoss(**focal_kwargs)
+        if not square_dice:
+            self.dc = SoftDiceLoss(apply_nonlin=softmax_helper, **soft_dice_kwargs)
+        else:
+            self.dc = SoftDiceLossSquared(apply_nonlin=softmax_helper, **soft_dice_kwargs)
+
+    def forward(self, net_output, target):
+        dc_loss = self.dc(net_output, target)
+        fo_loss = self.fo(net_output, target)
+        if self.aggregate == "sum":
+            result = fo_loss + dc_loss
+        else:
+            raise NotImplementedError("nah son") # reserved for other stuff (later?)
+        return result
+    
+class DC_and_focalv2_loss(nn.Module):
+    def __init__(self, soft_dice_kwargs, focal_kwargs, aggregate="sum", square_dice=False):
+        super(DC_and_focalv2_loss, self).__init__()
+        self.aggregate = aggregate
+        self.fo = FocalLossV2(**focal_kwargs)
+        if not square_dice:
+            self.dc = SoftDiceLoss(apply_nonlin=softmax_helper, **soft_dice_kwargs)
+        else:
+            self.dc = SoftDiceLossSquared(apply_nonlin=softmax_helper, **soft_dice_kwargs)
+
+    def forward(self, net_output, target):
+        dc_loss = self.dc(net_output, target)
+        fo_loss = self.fo(net_output, target)
+        if self.aggregate == "sum":
+            result = fo_loss + dc_loss
         else:
             raise NotImplementedError("nah son") # reserved for other stuff (later?)
         return result
