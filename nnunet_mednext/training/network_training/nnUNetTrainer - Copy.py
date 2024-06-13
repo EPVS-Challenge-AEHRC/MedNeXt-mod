@@ -46,7 +46,7 @@ matplotlib.use("agg")
 
 
 class nnUNetTrainer(NetworkTrainer):
-    def __init__(self, plans_file, fold, max_num_epochs=1000, output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
+    def __init__(self, plans_file, fold, output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
                  unpack_data=True, deterministic=True, fp16=False, sample_by_frequency=False):
         """
         :param deterministic:
@@ -74,7 +74,7 @@ class nnUNetTrainer(NetworkTrainer):
         """
         super(nnUNetTrainer, self).__init__(deterministic, fp16)
         self.unpack_data = unpack_data
-        self.init_args = (plans_file, fold, max_num_epochs, output_folder, dataset_directory, batch_dice, stage, unpack_data,
+        self.init_args = (plans_file, fold, output_folder, dataset_directory, batch_dice, stage, unpack_data,
                           deterministic, fp16)
         # set through arguments from init
         self.stage = stage
@@ -84,7 +84,6 @@ class nnUNetTrainer(NetworkTrainer):
         self.dataset_directory = dataset_directory
         self.output_folder_base = self.output_folder
         self.fold = fold
-        self.max_num_epochs = max_num_epochs
         self.sample_by_frequency = sample_by_frequency
 
         self.plans = None
