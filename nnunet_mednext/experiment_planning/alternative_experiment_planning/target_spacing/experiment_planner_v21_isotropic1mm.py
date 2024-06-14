@@ -63,6 +63,38 @@ class ExperimentPlanner3D_v21_customTargetSpacing_1x1x1(ExperimentPlanner3D_v21)
         )
         plans["patch_size"] = [128, 128, 128]
         return plans
+    
+    
+class ExperimentPlanner3D_v21_customTargetSpacing_05X05x05(ExperimentPlanner3D_v21):
+    def __init__(self, folder_with_cropped_data, preprocessed_output_folder):
+        super(ExperimentPlanner3D_v21, self).__init__(folder_with_cropped_data, preprocessed_output_folder)
+        # we change the data identifier and plans_fname. This will make this experiment planner save the preprocessed
+        # data in a different folder so that they can co-exist with the default (ExperimentPlanner3D_v21). We also
+        # create a custom plans file that will be linked to this data
+        self.data_identifier = "nnUNetData_plans_v2.1_trgSp_05X05x05"
+        self.plans_fname = join(self.preprocessed_output_folder,
+                                "nnUNetPlansv2.1_trgSp_05X05x05_plans_3D.pkl")
+
+    def get_target_spacing(self):
+        # simply return the desired spacing as np.array
+        return np.array([0.5, 0.5, 0.5]) # make sure this is float!!!! Not int!
+    
+    def get_properties_for_stage(
+        self, current_spacing, original_spacing, original_shape, num_cases, num_modalities, num_classes
+    ):
+        """
+        ExperimentPlanner configures pooling so that we pool late. Meaning that if the number of pooling per axis is
+        (2, 3, 3), then the first pooling operation will always pool axes 1 and 2 and not 0, irrespective of spacing.
+        This can cause a larger memory footprint, so it can be beneficial to revise this.
+
+        Here we are pooling based on the spacing of the data.
+
+        """
+        plans = super(ExperimentPlanner3D_v21_customTargetSpacing_05X05x05, self).get_properties_for_stage(
+            current_spacing, original_spacing, original_shape, num_cases, num_modalities, num_classes
+        )
+        plans["patch_size"] = [128, 128, 128]
+        return plans
 
 
 class ExperimentPlanner2D_v21_customTargetSpacing_1x1x1(ExperimentPlanner2D_v21):

@@ -43,7 +43,7 @@ class nnUNetTrainerV2(nnUNetTrainer):
 
     def __init__(self, plans_file, fold, max_num_epochs=1000, loss_function='DC_and_CE_loss', output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
                  unpack_data=True, deterministic=True, fp16=False, sample_by_frequency=False):
-        super().__init__(plans_file, fold, max_num_epochs, output_folder, dataset_directory, batch_dice, stage, unpack_data,
+        super().__init__(plans_file, fold, max_num_epochs, loss_function, output_folder, dataset_directory, batch_dice, stage, unpack_data,
                          deterministic, fp16, sample_by_frequency)
         self.max_num_epochs = max_num_epochs
         self.loss_function = loss_function
