@@ -41,13 +41,13 @@ class nnUNetTrainerV2(nnUNetTrainer):
     Info for Fabian: same as internal nnUNetTrainerV2_2
     """
 
-    def __init__(self, plans_file, fold, max_num_epochs=1000, loss_function='DC_and_CE_loss', output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
+    def __init__(self, plans_file, fold, max_num_epochs=1000, loss_function='DC_and_CE_loss', initial_lr=1e-3, output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
                  unpack_data=True, deterministic=True, fp16=False, sample_by_frequency=False):
-        super().__init__(plans_file, fold, max_num_epochs, loss_function, output_folder, dataset_directory, batch_dice, stage, unpack_data,
+        super().__init__(plans_file, fold, max_num_epochs, loss_function, initial_lr, output_folder, dataset_directory, batch_dice, stage, unpack_data,
                          deterministic, fp16, sample_by_frequency)
         self.max_num_epochs = max_num_epochs
         self.loss_function = loss_function
-        self.initial_lr = 1e-2
+        self.initial_lr = initial_lr#1e-2
         self.deep_supervision_scales = None
         self.ds_loss_weights = None
 

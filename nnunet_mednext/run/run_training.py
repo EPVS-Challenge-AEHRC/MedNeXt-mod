@@ -35,6 +35,7 @@ def main():
     parser.add_argument("fold", help='0, 1, ..., 5 or \'all\'')
     parser.add_argument("max_num_epochs", help="number of maximum epochs", type=int, default=1000)
     parser.add_argument("loss_function", help="select the loss function", default='DC_and_CE_loss')
+    parser.add_argument("-lr", help="initial learning rate", type=float, default=1e-3)
     parser.add_argument("-val", "--validation_only", help="use this if you want to only run the validation",
                         action="store_true")
     parser.add_argument("-c", "--continue_training", help="use this if you want to continue a training",
@@ -101,6 +102,7 @@ def main():
     fold = args.fold
     max_num_epochs = args.max_num_epochs
     loss_function = args.loss_function
+    initial_lr = args.lr
     network = args.network
     network_trainer = args.network_trainer
     validation_only = args.validation_only
@@ -157,7 +159,7 @@ def main():
         assert issubclass(trainer_class,
                           nnUNetTrainer), "network_trainer was found but is not derived from nnUNetTrainer"
 
-    trainer = trainer_class(plans_file, fold, max_num_epochs, loss_function, output_folder=output_folder_name, dataset_directory=dataset_directory,
+    trainer = trainer_class(plans_file, fold, max_num_epochs, loss_function, initial_lr, output_folder=output_folder_name, dataset_directory=dataset_directory,
                             batch_dice=batch_dice, stage=stage, unpack_data=decompress_data,
                             deterministic=deterministic,
                             fp16=run_mixed_precision)

@@ -93,7 +93,7 @@ class ExperimentPlanner3D_v21_customTargetSpacing_05X05x05(ExperimentPlanner3D_v
         plans = super(ExperimentPlanner3D_v21_customTargetSpacing_05X05x05, self).get_properties_for_stage(
             current_spacing, original_spacing, original_shape, num_cases, num_modalities, num_classes
         )
-        plans["patch_size"] = [128, 128, 128]
+        plans["patch_size"] = [256, 256, 256]
         return plans
 
 

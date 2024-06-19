@@ -128,6 +128,10 @@ def get_tp_fp_fn_tn(net_output, gt, axes=None, mask=None, square=False):
             gt = gt.long()
             y_onehot = torch.zeros(shp_x, device=net_output.device)
             y_onehot.scatter_(1, gt, 1)
+            
+    if torch.isnan(y_onehot).any():
+        print(f"NaNs in y_onehot: {y_onehot}")
+        raise ValueError("NaNs detected in one-hot encoded ground truth")
 
     tp = net_output * y_onehot
     fp = net_output * (1 - y_onehot)
@@ -167,6 +171,17 @@ class SoftDiceLoss(nn.Module):
         self.smooth = smooth
 
     def forward(self, x, y, loss_mask=None):
+        
+        if torch.isnan(x).any() or torch.isnan(y).any():
+            print(f"NaNs in input tensors - x: {x}, y: {y}")
+            print(f"Shape of x: {x.shape}, Shape of y: {y.shape}")
+            print(f"Max value in x: {torch.max(x)}, Min value in x: {torch.min(x)}")
+            print(f"Max value in y: {torch.max(y)}, Min value in y: {torch.min(y)}")
+            
+            raise ValueError("Input tensors contain NaNs")
+            
+        
+           
         shp_x = x.shape
 
         if self.batch_dice:
@@ -176,11 +191,21 @@ class SoftDiceLoss(nn.Module):
 
         if self.apply_nonlin is not None:
             x = self.apply_nonlin(x)
+            
+        if torch.isnan(x).any() or torch.isnan(y).any():
+            print(f"NaNs in softmax processed input tensors - x: {x}")
+            raise ValueError("Input tensors x contain NaNs after softmax")
 
         tp, fp, fn, _ = get_tp_fp_fn_tn(x, y, axes, loss_mask, False)
 
         nominator = 2 * tp + self.smooth
         denominator = 2 * tp + fp + fn + self.smooth
+        
+        if torch.isnan(tp).any() or torch.isnan(fp).any() or torch.isnan(fn).any():
+            print(f"NaNs in tp, fp, or fn - TP: {tp}, FP: {fp}, FN: {fn}")
+
+        if torch.isnan(nominator).any() or torch.isnan(denominator).any():
+            print(f"NaNs in nominator or denominator - Nominator: {nominator}, Denominator: {denominator}")
 
         dc = nominator / (denominator + 1e-8)
 
@@ -190,6 +215,10 @@ class SoftDiceLoss(nn.Module):
             else:
                 dc = dc[:, 1:]
         dc = dc.mean()
+        
+        if torch.isnan(dc).any():
+            print(f"NaNs in SoftDiceLoss - DC: {dc}")
+            raise ValueError("SoftDiceLoss computation resulted in NaN")
 
         return -dc
 
