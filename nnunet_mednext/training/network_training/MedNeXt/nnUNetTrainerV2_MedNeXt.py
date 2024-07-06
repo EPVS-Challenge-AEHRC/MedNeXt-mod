@@ -59,6 +59,12 @@ class nnUNetTrainerV2_MedNeXt_S_kernel3(nnUNetTrainerV2_Optim_and_LR):
         if torch.cuda.is_available():
             self.network.cuda()
 
+class nnUNetTrainerV2_MedNeXt_S_kernel3_lr_1e_4(nnUNetTrainerV2_MedNeXt_S_kernel3):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_lr = 1e-4
+
 
 class nnUNetTrainerV2_MedNeXt_B_kernel3(nnUNetTrainerV2_Optim_and_LR):   
         
@@ -78,6 +84,17 @@ class nnUNetTrainerV2_MedNeXt_B_kernel3(nnUNetTrainerV2_Optim_and_LR):
         if torch.cuda.is_available():
             self.network.cuda()
 
+class nnUNetTrainerV2_MedNeXt_B_kernel3_lr_1e_4(nnUNetTrainerV2_MedNeXt_B_kernel3):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_lr = 1e-4
+
+class nnUNetTrainerV2_MedNeXt_B_kernel3_lr_5e_4(nnUNetTrainerV2_MedNeXt_B_kernel3):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_lr = 5e-4
 
 class nnUNetTrainerV2_MedNeXt_M_kernel3(nnUNetTrainerV2_Optim_and_LR):   
         
@@ -98,6 +115,17 @@ class nnUNetTrainerV2_MedNeXt_M_kernel3(nnUNetTrainerV2_Optim_and_LR):
         if torch.cuda.is_available():
             self.network.cuda()
 
+class nnUNetTrainerV2_MedNeXt_M_kernel3_lr_1e_4(nnUNetTrainerV2_MedNeXt_M_kernel3):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_lr = 1e-4
+
+class nnUNetTrainerV2_MedNeXt_M_kernel3_lr_5e_4(nnUNetTrainerV2_MedNeXt_M_kernel3):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_lr = 5e-4
 
 class nnUNetTrainerV2_MedNeXt_L_kernel3(nnUNetTrainerV2_Optim_and_LR):   
         
@@ -120,6 +148,17 @@ class nnUNetTrainerV2_MedNeXt_L_kernel3(nnUNetTrainerV2_Optim_and_LR):
         if torch.cuda.is_available():
             self.network.cuda()
 
+class nnUNetTrainerV2_MedNeXt_L_kernel3_lr_1e_4(nnUNetTrainerV2_MedNeXt_L_kernel3):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_lr = 1e-4
+
+class nnUNetTrainerV2_MedNeXt_L_kernel3_lr_5e_4(nnUNetTrainerV2_MedNeXt_L_kernel3):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_lr = 5e-4
 
 # Kernels of size 5
 class nnUNetTrainerV2_MedNeXt_S_kernel5(nnUNetTrainerV2_Optim_and_LR):   
