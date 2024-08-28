@@ -23,7 +23,6 @@ from nnunet_mednext.training.network_training.nnUNetTrainer import nnUNetTrainer
 def recursive_find_python_class(folder, trainer_name, current_module):
     tr = None
     for importer, modname, ispkg in pkgutil.iter_modules(folder):
-        # print(modname, ispkg)
         if not ispkg:
             m = importlib.import_module(current_module + "." + modname)
             if hasattr(m, trainer_name):
@@ -58,7 +57,6 @@ def restore_model(pkl_file, checkpoint=None, train=False, fp16=None):
     name = info['name']
     search_in = join(nnunet_mednext.__path__[0], "training", "network_training")
     tr = recursive_find_python_class([search_in], name, current_module="nnunet_mednext.training.network_training")
-
     if tr is None:
         """
         Fabian only. This will trigger searching for trainer classes in other repositories as well
