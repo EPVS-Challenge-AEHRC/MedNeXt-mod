@@ -58,6 +58,26 @@ class nnUNetTrainerV2_MedNeXt_S_kernel3(nnUNetTrainerV2_Optim_and_LR):
 
         if torch.cuda.is_available():
             self.network.cuda()
+            
+class nnUNetTrainerV2_MedNeXt_S_kernel3_2d(nnUNetTrainerV2_Optim_and_LR):   
+    
+    def initialize_network(self):
+        self.network = MedNeXt(
+            in_channels = self.num_input_channels, 
+            n_channels = 32,
+            n_classes = self.num_classes, 
+            exp_r=2                 ,         # Expansion ratio as in Swin Transformers
+            kernel_size=3,                     # Can test kernel_size
+            deep_supervision=True,             # Can be used to test deep supervision
+            do_res=True,                      # Can be used to individually test residual connection
+            do_res_up_down = True,
+            block_counts = [2,2,2,2,2,2,2,2,2],
+            dim = '2d',
+            conv_op = nn.Conv2d
+        )
+
+        if torch.cuda.is_available():
+            self.network.cuda()
 
 class nnUNetTrainerV2_MedNeXt_S_kernel3_lr_1e_4(nnUNetTrainerV2_MedNeXt_S_kernel3):
     
@@ -174,6 +194,26 @@ class nnUNetTrainerV2_MedNeXt_S_kernel5(nnUNetTrainerV2_Optim_and_LR):
             do_res=True,                       # Can be used to individually test residual connection
             do_res_up_down = True,
             block_counts = [2,2,2,2,2,2,2,2,2]
+        )
+
+        if torch.cuda.is_available():
+            self.network.cuda()
+            
+class nnUNetTrainerV2_MedNeXt_S_kernel5_2d(nnUNetTrainerV2_Optim_and_LR):   
+
+    def initialize_network(self):
+        self.network = MedNeXt(
+            in_channels = self.num_input_channels, 
+            n_channels = 32,
+            n_classes = self.num_classes, 
+            exp_r=2,                           # Expansion ratio as in Swin Transformers
+            kernel_size=5,                     # Can test kernel_size
+            deep_supervision=True,             # Can be used to test deep supervision
+            do_res=True,                       # Can be used to individually test residual connection
+            do_res_up_down = True,
+            block_counts = [2,2,2,2,2,2,2,2,2],
+            dim = '2d',
+            conv_op = nn.Conv2d
         )
 
         if torch.cuda.is_available():
