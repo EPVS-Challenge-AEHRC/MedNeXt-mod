@@ -18,6 +18,16 @@ class MedNeXt(MedNeXt_Orig, SegmentationNetwork):
         self.num_classes = kwargs['n_classes']
         # self.do_ds = False        Already added this in the main class
 
+class MedNeXt_2d(MedNeXt_Orig, SegmentationNetwork):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Segmentation Network Params. Needed for the nnUNet evaluation pipeline
+        self.conv_op = nn.Conv2d
+        self.inference_apply_nonlin = softmax_helper
+        self.input_shape_must_be_divisible_by = 2**5
+        self.num_classes = kwargs['n_classes']
+        # self.do_ds = False        Already added
 
 class nnUNetTrainerV2_Optim_and_LR(nnUNetTrainerV2):
 
@@ -62,7 +72,7 @@ class nnUNetTrainerV2_MedNeXt_S_kernel3(nnUNetTrainerV2_Optim_and_LR):
 class nnUNetTrainerV2_MedNeXt_S_kernel3_2d(nnUNetTrainerV2_Optim_and_LR):   
     
     def initialize_network(self):
-        self.network = MedNeXt(
+        self.network = MedNeXt_2d(
             in_channels = self.num_input_channels, 
             n_channels = 32,
             n_classes = self.num_classes, 
@@ -72,8 +82,7 @@ class nnUNetTrainerV2_MedNeXt_S_kernel3_2d(nnUNetTrainerV2_Optim_and_LR):
             do_res=True,                      # Can be used to individually test residual connection
             do_res_up_down = True,
             block_counts = [2,2,2,2,2,2,2,2,2],
-            dim = '2d',
-            conv_op = nn.Conv2d
+            dim = '2d'
         )
 
         if torch.cuda.is_available():
@@ -202,7 +211,7 @@ class nnUNetTrainerV2_MedNeXt_S_kernel5(nnUNetTrainerV2_Optim_and_LR):
 class nnUNetTrainerV2_MedNeXt_S_kernel5_2d(nnUNetTrainerV2_Optim_and_LR):   
 
     def initialize_network(self):
-        self.network = MedNeXt(
+        self.network = MedNeXt_2d(
             in_channels = self.num_input_channels, 
             n_channels = 32,
             n_classes = self.num_classes, 
@@ -212,8 +221,7 @@ class nnUNetTrainerV2_MedNeXt_S_kernel5_2d(nnUNetTrainerV2_Optim_and_LR):
             do_res=True,                       # Can be used to individually test residual connection
             do_res_up_down = True,
             block_counts = [2,2,2,2,2,2,2,2,2],
-            dim = '2d',
-            conv_op = nn.Conv2d
+            dim = '2d'
         )
 
         if torch.cuda.is_available():
