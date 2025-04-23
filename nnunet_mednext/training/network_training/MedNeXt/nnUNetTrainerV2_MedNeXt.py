@@ -189,6 +189,12 @@ class nnUNetTrainerV2_MedNeXt_L_kernel3_lr_5e_4(nnUNetTrainerV2_MedNeXt_L_kernel
         super().__init__(*args, **kwargs)
         self.initial_lr = 5e-4
 
+class nnUNetTrainerV2_MedNeXt_L_kernel3_lr_25e_5(nnUNetTrainerV2_MedNeXt_L_kernel3):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_lr = 25e-5
+
 # Kernels of size 5
 class nnUNetTrainerV2_MedNeXt_S_kernel5(nnUNetTrainerV2_Optim_and_LR):   
 
